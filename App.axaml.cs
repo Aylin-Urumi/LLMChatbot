@@ -1,11 +1,28 @@
+using System;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using DotNetEnv;
+using LLMChatbot.Services;
+using LLMChatbot.ViewModels;
+using LLMChatbot.Views;
 
 namespace LLMChatbot;
 
 public partial class App : Application
 {
+    private static string LogFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "chatbot_debug.txt");
+
+    private void Log(string message)
+    {
+        try
+        {
+            File.AppendAllText(LogFile, $"{DateTime.Now:HH:mm:ss} - {message}\n");
+        }
+        catch { }
+    }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -13,11 +30,42 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        try
         {
-            desktop.MainWindow = new MainWindow();
-        }
+            Log("=== App Starting ===");
+            Log($"Working directory: {Directory.GetCurrentDirectory()}");
+            Log($".env exists: {File.Exists(".env")}");
 
-        base.OnFrameworkInitializationCompleted();
+            Env.Load();
+            Log(".env loaded");
+
+            var apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+            Log($"API Key found: {!string.IsNullOrEmpty(apiKey)}");
+            if (!string.IsNullOrEmpty(apiKey))
+                Log($"Key starts with: {apiKey.Substring(0, 10)}");
+
+            if (string.IsNullOrEmpty(apiKey))
+                throw new Exception("API key not found!");
+
+            Log("Creating GeminiService...");
+            var geminiService = new GeminiService(apiKey);
+            Log("GeminiService created!");
+
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.MainWindow = new MainWindow
+                {
+                    DataContext = new MainViewModel(geminiService)
+                };
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
+        catch (Exception ex)
+        {
+            Log($"ERROR: {ex.Message}");
+            Log($"Stack: {ex.StackTrace}");
+            throw;
+        }
     }
 }

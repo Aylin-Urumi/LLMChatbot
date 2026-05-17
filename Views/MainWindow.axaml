@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:LLMChatbot"
+        xmlns:vm="using:LLMChatbot.ViewModels"
+        x:Class="LLMChatbot.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="LLM Chatbot"
+        Width="600" Height="700"
+        Background="#F5F5F5">
+
+  <Grid RowDefinitions="*, Auto" Margin="16">
+
+    <!-- Chat messages list -->
+    <ScrollViewer Grid.Row="0" Name="ScrollViewer">
+      <ItemsControl ItemsSource="{Binding Messages}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="local:Message">
+            <Border Margin="4,6"
+                    Padding="12,8"
+                    CornerRadius="12"
+                    HorizontalAlignment="{Binding Role, 
+                      Converter={StaticResource RoleToAlignmentConverter}}"
+                    Background="{Binding Role, 
+                      Converter={StaticResource RoleToColorConverter}}">
+              <TextBlock Text="{Binding Content}"
+                         Foreground="White"
+                         TextWrapping="Wrap"
+                         MaxWidth="400"/>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <!-- Input area -->
+    <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+      <TextBox Grid.Column="0"
+               Text="{Binding UserInput}"
+               Watermark="Type a message..."
+               CornerRadius="20"
+               Padding="16,10"
+               Margin="0,0,8,0"/>
+
+      <Button Grid.Column="1"
+              Content="Send"
+              IsEnabled="{Binding !IsBusy}"
+              Click="OnSendClicked"
+              CornerRadius="20"
+              Padding="20,10"
+              Background="#6750A4"
+              Foreground="White"/>
+    </Grid>
+
+  </Grid>
+</Window>
