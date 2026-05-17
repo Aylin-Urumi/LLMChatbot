@@ -5,8 +5,8 @@
         x:Class="LLMChatbot.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Title="LLM Chatbot"
-        Width="600" Height="700"
-        Background="#F5F5F5">
+        Width="700" Height="700"
+        Background="#716767">
 
   <Grid RowDefinitions="*, Auto" Margin="16">
 
@@ -15,25 +15,33 @@
       <ItemsControl ItemsSource="{Binding Messages}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="local:Message">
-            <Border Margin="4,6"
-                    Padding="12,8"
-                    CornerRadius="12"
-                    HorizontalAlignment="{Binding Role, 
-                      Converter={StaticResource RoleToAlignmentConverter}}"
-                    Background="{Binding Role, 
-                      Converter={StaticResource RoleToColorConverter}}">
-              <TextBlock Text="{Binding Content}"
-                         Foreground="White"
-                         TextWrapping="Wrap"
-                         MaxWidth="400"/>
-            </Border>
+            <StackPanel Margin="4,6" Spacing="4">
+              <Border Padding="12,8"
+                      CornerRadius="12"
+                      HorizontalAlignment="{Binding Role, 
+                        Converter={StaticResource RoleToAlignmentConverter}}"
+                      Background="{Binding Role, 
+                        Converter={StaticResource RoleToColorConverter}}">
+                <TextBlock Text="{Binding Content}"
+                           Foreground="White"
+                           TextWrapping="Wrap"
+                           MaxWidth="400"/>
+              </Border>
+              <TextBlock Text="{Binding Timestamp, Converter={StaticResource TimestampConverter}}"
+                         Foreground="#999999"
+                         FontSize="11"
+                         Margin="12,0,0,0"
+                         HorizontalAlignment="{Binding Role, 
+                           Converter={StaticResource RoleToAlignmentConverter}}"/>
+            </StackPanel>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
     </ScrollViewer>
 
     <!-- Input area -->
-    <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+    <Grid Grid.Row="1" ColumnDefinitions="*, Auto, Auto, Auto" Margin="0,8,0,0">
+
       <TextBox Grid.Column="0"
                Text="{Binding UserInput}"
                Watermark="Type a message..."
@@ -49,6 +57,23 @@
               Padding="20,10"
               Background="#6750A4"
               Foreground="White"/>
+
+      <Button Grid.Column="2"
+              Content="Save"
+              Click="OnSaveClicked"
+              CornerRadius="20"
+              Padding="20,10"
+              Background="#4CAF50"
+              Foreground="White"/>
+
+      <Button Grid.Column="3"
+              Content="Clear"
+              Click="OnClearClicked"
+              CornerRadius="20"
+              Padding="20,10"
+              Background="#D32F2F"
+              Foreground="White"/>
+          
     </Grid>
 
   </Grid>

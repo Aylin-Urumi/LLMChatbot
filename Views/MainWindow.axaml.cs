@@ -1,7 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using LLMChatbot.ViewModels;
-using LLMChatbot.Views;
 
 namespace LLMChatbot.Views;
 
@@ -18,10 +18,24 @@ public partial class MainWindow : Window
         {
             await vm.SendMessageAsync();
 
-            // Auto-scroll to latest message
             var scrollViewer = this.FindControl<ScrollViewer>("ScrollViewer");
             if (scrollViewer != null)
                 scrollViewer.Offset = new Avalonia.Vector(0, double.MaxValue);
+        }
+    }
+
+    private void OnClearClicked(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel vm)
+        {
+            vm.ClearChat();
+        }
+    }
+    private async void OnSaveClicked(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel vm)
+        {
+            await vm.SaveChatAsync();
         }
     }
 }

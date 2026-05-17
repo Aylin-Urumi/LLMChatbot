@@ -7,6 +7,7 @@
     <Application.Resources>
         <converters:RoleToColorConverter x:Key="RoleToColorConverter"/>
         <converters:RoleToAlignmentConverter x:Key="RoleToAlignmentConverter"/>
+        <converters:TimestampConverter x:Key="TimestampConverter"/>
     </Application.Resources>
 
     <Application.Styles>
