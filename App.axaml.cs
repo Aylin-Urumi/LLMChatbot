@@ -33,17 +33,10 @@ public partial class App : Application
         try
         {
             Log("=== App Starting ===");
-            Log($"Working directory: {Directory.GetCurrentDirectory()}");
-            Log($".env exists: {File.Exists(".env")}");
-
             Env.Load();
             Log(".env loaded");
 
             var apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
-            Log($"API Key found: {!string.IsNullOrEmpty(apiKey)}");
-            if (!string.IsNullOrEmpty(apiKey))
-                Log($"Key starts with: {apiKey.Substring(0, 10)}");
-
             if (string.IsNullOrEmpty(apiKey))
                 throw new Exception("API key not found!");
 
@@ -64,7 +57,6 @@ public partial class App : Application
         catch (Exception ex)
         {
             Log($"ERROR: {ex.Message}");
-            Log($"Stack: {ex.StackTrace}");
             throw;
         }
     }

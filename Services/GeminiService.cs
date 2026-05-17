@@ -11,7 +11,6 @@ public class GeminiService
 {
     private readonly string _apiKey;
     private readonly HttpClient _httpClient;
-    private const string ApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
 
     public GeminiService(string apiKey)
     {
@@ -24,6 +23,8 @@ public class GeminiService
         var fullPrompt = string.Join("\n", conversation.Messages
             .Select(m => $"{m.Role}: {m.Content}"));
 
+        var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}";
+
         var requestBody = new
         {
             contents = new[]
@@ -35,19 +36,28 @@ public class GeminiService
         var json = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync($"{ApiUrl}?key={_apiKey}", content);
+        var response = await _httpClient.PostAsync(url, content);
         var responseText = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
-            throw new Exception($"API Error: {responseText}");
+        {
+            throw new Exception($"API Error - Status: {response.StatusCode}\nResponse: {responseText}");
+        }
 
-        var result = JsonDocument.Parse(responseText);
-        var text = result.RootElement.GetProperty("candidates")[0]
-            .GetProperty("content")
-            .GetProperty("parts")[0]
-            .GetProperty("text")
-            .GetString();
+        try
+        {
+            var result = JsonDocument.Parse(responseText);
+            var text = result.RootElement.GetProperty("candidates")[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
+                .GetString();
 
-        return text ?? "No response received.";
+            return text ?? "No response received.";
+        }
+        catch (Exception parseEx)
+        {
+            throw new Exception($"Failed to parse response: {parseEx.Message}\nRaw response: {responseText}");
+        }
     }
 }
